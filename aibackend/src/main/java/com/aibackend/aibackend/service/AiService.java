@@ -14,29 +14,20 @@ import java.net.URL;
 
 @Service
 public class AiService {
-
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
 
     @Value("${openai.api.key}")
     private String openaiApiKey;
 
-    public String getAPIResponse(String apiUrl) throws IOException {
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+    public String generateSQLQuery(String userInput) throws IOException {
+        String prompt = "Generate a PostgresSQL query to " + userInput +
+                " from a users table with columns: id, name, age. " +
+                "Return only the SQL query without any explanation.";
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-        conn.disconnect();
-        return content.toString();
+        return sendToChatGPT(prompt);
     }
 
-    public String sendToChatGPT(String jsonResponse, String userInput) throws IOException {
+    public String sendToChatGPT(String prompt) throws IOException {
         URL url = new URL(API_URL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -49,7 +40,7 @@ public class AiService {
         JSONArray messages = new JSONArray();
         JSONObject message = new JSONObject();
         message.put("role", "user");
-        message.put("content", "קיבלתי את הנתונים הבאים מה-API: " + jsonResponse + "\n" + userInput);
+        message.put("content", prompt);
         messages.put(message);
         jsonBody.put("messages", messages);
 
@@ -67,6 +58,27 @@ public class AiService {
         conn.disconnect();
 
         JSONObject responseObject = new JSONObject(response.toString());
-        return responseObject.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+        JSONArray choicesArray = responseObject.getJSONArray("choices");
+        if (choicesArray.length() > 0) {
+            JSONObject firstChoice = choicesArray.getJSONObject(0);
+            if (firstChoice.has("message") && firstChoice.getJSONObject("message").has("content")) {
+                return firstChoice.getJSONObject("message").getString("content");
+            }
+        }
+        return "No content found in the response.";
+    }
+    public String getAPIResponse(String apiUrl) throws IOException {
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String inputLine;
+        StringBuilder content = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+        in.close();
+        conn.disconnect();
+        return content.toString();
     }
 }

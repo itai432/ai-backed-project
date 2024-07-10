@@ -20,9 +20,12 @@ public class AiService {
     private String openaiApiKey;
 
     public String generateSQLQuery(String userInput) throws IOException {
-        String prompt = "Generate a PostgresSQL query to " + userInput +
-                " from a users table with columns: id, name, age. " +
-                "Return only the SQL query without any explanation.";
+        String prompt = "Generate a PostgreSQL query based on the following request: \"" + userInput + "\". " +
+                "Use the tables: app_users, app_books, and app_users_books. " +
+                "The app_users table has columns: user_id, username, password, email, full_name, date_of_birth, purchases. " +
+                "The app_books table has columns: book_id, title, author, published_year, genre, purchases. " +
+                "The app_users_books table has columns: id, user_id, book_id, purchase_date. " +
+                "Ensure the query is syntactically correct and optimized.";
 
         return sendToChatGPT(prompt);
     }
@@ -62,23 +65,9 @@ public class AiService {
         if (choicesArray.length() > 0) {
             JSONObject firstChoice = choicesArray.getJSONObject(0);
             if (firstChoice.has("message") && firstChoice.getJSONObject("message").has("content")) {
-                return firstChoice.getJSONObject("message").getString("content");
+                return firstChoice.getJSONObject("message").getString("content").trim();
             }
         }
         return "No content found in the response.";
-    }
-    public String getAPIResponse(String apiUrl) throws IOException {
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-        in.close();
-        conn.disconnect();
-        return content.toString();
     }
 }

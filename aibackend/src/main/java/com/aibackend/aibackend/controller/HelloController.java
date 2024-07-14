@@ -26,6 +26,7 @@ public class HelloController {
             for (Object[] result : results) {
                 response.append(Arrays.toString(result)).append("\n");
             }
+            userService.saveCallHistory(userInput, response.toString()); // שמירת היסטוריה
             return new ResponseEntity<>(response.toString(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -37,6 +38,7 @@ public class HelloController {
         try {
             String sqlQuery = aiService.generateSQLQuery(userInput);
             List<Object[]> results = userService.executeCustomQuery(sqlQuery);
+            userService.saveCallHistory(userInput, results.toString()); // שמירת היסטוריה
             return new ResponseEntity<>(results, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

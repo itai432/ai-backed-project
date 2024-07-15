@@ -34,7 +34,6 @@ public class AppUserService {
     }
 
     public List<Object[]> executeCustomQuery(String sql) {
-        // Use native query directly to ensure correct syntax
         return entityManager.createNativeQuery(sql).getResultList();
     }
 

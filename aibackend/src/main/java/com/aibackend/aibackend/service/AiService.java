@@ -20,11 +20,12 @@ public class AiService {
     private String openaiApiKey;
 
     public String generateSQLQuery(String userInput) throws IOException {
-        String prompt = "Translate the following request into a PostgreSQL query: \"" + userInput + "\". " +
-                "Ensure the query is valid and does not contain any explanation. Use the tables: app_users, app_books, and app_users_books. " +
+        String prompt =  "Generate a PostgreSQL query based on the following request: \"" + userInput + "\". " +
+                "Use the tables: app_users, app_books, call_history, and app_users_books. " +
                 "The app_users table has columns: user_id, username, password, email, full_name, date_of_birth, purchases. " +
                 "The app_books table has columns: book_id, title, author, published_year, genre, purchases. " +
-                "The app_users_books table has columns: id, user_id, book_id, purchase_date.";
+                "The app_users_books table has columns: id, user_id, book_id, purchase_date. " +
+                "Ensure the query is syntactically correct and optimized.";
 
         return sendToChatGPT(prompt);
     }

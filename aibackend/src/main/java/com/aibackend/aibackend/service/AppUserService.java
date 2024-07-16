@@ -10,6 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class AppUserService {
@@ -23,7 +25,10 @@ public class AppUserService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private static final Logger logger = LoggerFactory.getLogger(AppUserService.class);
+
     public AppUser saveUser(AppUser user) {
+        logger.info("Saving user: {}", user);
         return appUserRepository.save(user);
     }
 
@@ -40,5 +45,13 @@ public class AppUserService {
     public void saveCallHistory(String question, String response) {
         String sql = "INSERT INTO call_history (question, response) VALUES (?, ?)";
         jdbcTemplate.update(sql, question, response);
+    }
+
+    public AppUser findByUsername(String username) {
+        return appUserRepository.findByUsername(username);
+    }
+
+    public AppUser findByUsernameAndPassword(String username, String password) {
+        return appUserRepository.findByUsernameAndPassword(username, password);
     }
 }

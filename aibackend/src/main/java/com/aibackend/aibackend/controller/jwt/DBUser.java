@@ -1,6 +1,5 @@
 package com.aibackend.aibackend.controller.jwt;
 
-
 import com.google.common.base.MoreObjects;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -9,22 +8,30 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users")
+@Table(name = "app_user") // התאמנו את שם הטבלה
 public class DBUser implements Serializable, Persistable<Long> {
 
     private static final long serialVersionUID = -5554304839188669754L;
 
-    protected Long id;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Access(AccessType.PROPERTY)
-    public Long getId() {
-        return id;
-    }
+    private Long id;
 
-    protected void setId(final Long id) {
-        this.id = id;
+    @Column(nullable = false, length = 255)
+    private String username; // השתמשנו בשם השדה החדש
+
+    @Column(nullable = false, length = 255)
+    private String password;
+
+    @Column(nullable = false, length = 255)
+    private String email;
+
+    protected DBUser() {}
+
+    @Transient
+    public static String hashPassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 
     @Override
@@ -33,67 +40,71 @@ public class DBUser implements Serializable, Persistable<Long> {
         return null == getId();
     }
 
-
-    @Column(nullable = false, length = 60)
-    private String name;
-
-
-    @Column(nullable = false, length = 255)
-    private String password;
-
-    protected DBUser() {
+    public Long getId() {
+        return id;
     }
 
-    @Transient
-    public static String hashPassword(String password) {
-        return new BCryptPasswordEncoder().encode(password);
-//        return Hashing.sha256().hashString(password, Charset.defaultCharset()).toString();
+    protected void setId(final Long id) {
+        this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", getId())
-                .add("name", name)
-                .toString();
+    public String getUsername() {
+        return username;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setPassword(String password) {
-        this.password = password; //DBUser.hashPassword(unencryptedPassword);
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", getId())
+                .add("username", username)
+                .add("email", email)
+                .toString();
+    }
 
     public static final class UserBuilder {
         protected Long id;
-        private String name;
-        private String password;//https://bcrypt-generator.com/ generate password user+email:javainuse,password:$2y$12$JfmXLQVmTZGpeYVgr6AVhejDGynQ739F4pJE1ZjyCPTvKIHTYb2fi
+        private String username;
+        private String password;
+        private String email;
 
-        private UserBuilder() {
-        }
+        private UserBuilder() {}
 
         public static UserBuilder anUser() {
             return new UserBuilder();
         }
 
-        public UserBuilder name(String name) {
-            this.name = name;
+        public UserBuilder username(String username) {
+            this.username = username;
             return this;
         }
 
         public UserBuilder password(String password) {
             this.password = password;
+            return this;
+        }
+
+        public UserBuilder email(String email) {
+            this.email = email;
             return this;
         }
 
@@ -104,8 +115,9 @@ public class DBUser implements Serializable, Persistable<Long> {
 
         public DBUser build() {
             DBUser user = new DBUser();
-            user.setName(name);
+            user.setUsername(username);
             user.setPassword(password);
+            user.setEmail(email);
             user.setId(id);
             return user;
         }

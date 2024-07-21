@@ -50,8 +50,4 @@ public class AppUserService {
     public AppUser findByUsername(String username) {
         return appUserRepository.findByUsername(username);
     }
-
-    public AppUser findByUsernameAndPassword(String username, String password) {
-        return appUserRepository.findByUsernameAndPassword(username, password);
-    }
 }

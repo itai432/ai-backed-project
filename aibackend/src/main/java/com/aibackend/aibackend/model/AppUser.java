@@ -1,41 +1,31 @@
 package com.aibackend.aibackend.model;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "app_user")
 public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 255)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String email;
 
-    @Column
-    private String fullName;
-
-    @Column(nullable = false)
-    private Date dateOfBirth;
-
-    @Column(columnDefinition = "integer default 0")
-    private Integer purchases;
-
     // Getters and Setters
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -60,29 +50,5 @@ public class AppUser {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public Integer getPurchases() {
-        return purchases;
-    }
-
-    public void setPurchases(Integer purchases) {
-        this.purchases = purchases;
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -18,12 +17,8 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-
-        Optional<DBUser> dbUser = userService.findUserName(userName);
-        if (dbUser.isPresent()) {
-            return new User(dbUser.get().getName(), dbUser.get().getPassword(), new ArrayList<>());
-        } else {
-            throw new UsernameNotFoundException("User not found : " + userName);
-        }
+        DBUser dbUser = userService.findByUsername(userName)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userName));
+        return new User(dbUser.getUsername(), dbUser.getPassword(), new ArrayList<>()); // השתמשנו ב-getUsername במקום getName
     }
 }

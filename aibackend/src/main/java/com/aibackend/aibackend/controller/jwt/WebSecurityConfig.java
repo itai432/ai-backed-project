@@ -52,11 +52,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/authenticate",
+                .antMatchers("/api/login", "/api/register").permitAll() // נתיבי login ו-register פתוחים ללא אימות JWT
+                .antMatchers("/","/assets/*","/index.html","/authenticate",
                         "/user",
                         "/actuator/**",
-                        "/api/login",
-                        "/api/register",
                         "/swagger-ui.html**",
                         "/v2/api-docs",
                         "/configuration/ui",
@@ -64,13 +63,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/configuration/security",
                         "/swagger-ui/**",
                         "/webjars/**").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // נתיבי OPTIONS פתוחים
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        // הוספת פילטר JWT לפני UsernamePasswordAuthenticationFilter
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
